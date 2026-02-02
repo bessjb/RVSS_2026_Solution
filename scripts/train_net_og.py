@@ -33,16 +33,18 @@ def imshow(img):
     plt.show()
 
 #######################################################################################################################################
+####     INITIALISE OUR NETWORK                                                                                                    ####
+#######################################################################################################################################
+
+net = NeuralNet()
+
+#######################################################################################################################################
 ####     SETTING UP THE DATASET                                                                                                    ####
 #######################################################################################################################################
 
 
 # transformations for raw images before going to CNN
-transform = transforms.Compose([transforms.ToTensor(),
-                                transforms.Resize((40, 60)),
-                                transforms.Normalize(
-                                    (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-                                ])
+transform = net.transform
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -104,12 +106,6 @@ plt.xticks(all_lbls)
 plt.title('Validation Dataset')
 plt.show()
 
-#######################################################################################################################################
-####     INITIALISE OUR NETWORK                                                                                                    ####
-#######################################################################################################################################
-
-
-net = NeuralNet()
 
 #######################################################################################################################################
 ####     INITIALISE OUR LOSS FUNCTION AND OPTIMISER                                                                                ####
@@ -186,7 +182,7 @@ for epoch in range(10):  # loop over the dataset multiple times
     losses['val'] += [val_loss/len(valloader)]
 
     if np.mean(class_accs) > best_acc:
-        torch.save(net.state_dict(), 'steer_net.pth')
+        torch.save(net.state_dict(), '../weights/steer_net_pth')
         best_acc = np.mean(class_accs)
 
 print('Finished Training')
@@ -207,7 +203,7 @@ plt.show()
 #######################################################################################################################################
 ####     PERFORMANCE EVALUATION                                                                                                    ####
 #######################################################################################################################################
-net.load_state_dict(torch.load('steer_net.pth'))
+net.load_state_dict(torch.load('../weights/steer_net.pth'))
 
 correct = 0
 total = 0
@@ -223,8 +219,7 @@ with torch.no_grad():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-print(f'Accuracy of the network on the {
-      total} test images: {100 * correct // total} %')
+print('Accuracy of the network on the test images: {}%'.format(100 * correct // total))
 
 # prepare to count predictions for each class
 correct_pred = {classname: 0 for classname in val_ds.class_labels}

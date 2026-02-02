@@ -13,9 +13,14 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 
+ 
+
+
+
 class NeuralNet(nn.Module):
-    def __init__(self):
+    def __init__(self, deployed=False):
         super().__init__()
+        self.deployed = deployed
 
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.conv2 = nn.Conv2d(6, 16, 5)
@@ -24,23 +29,19 @@ class NeuralNet(nn.Module):
         self.fc2 = nn.Linear(256, 5)
         self.relu = nn.ReLU()
 
-        self.layers = [
-            self.conv1,
-            self.conv2,
-            self.pool,
-            self.fc1,
-            self.fc2,
-            self.relu
-        ]
-
-    def transform_images(self):
-        transform = transforms.Compose([transforms.ToTensor(),
+        self.transform = transforms.Compose([transforms.ToTensor(),
                                         transforms.Resize((40, 60)),
                                         transforms.Normalize(
                                             (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                                         ])
 
+    def transform_image(self, image):
+        return self.transform(image)
+
     def forward(self, x):
+        if self.deployed is True:
+            x = x.unsqueeze(0)
+
         # extract features with convolutional layers
         x = self.pool(self.relu(self.conv1(x)))
         x = self.pool(self.relu(self.conv2(x)))
@@ -53,6 +54,9 @@ class NeuralNet(nn.Module):
 
         return x
 
+    def post_process(self, z):
+        return torch.argmax(z).item()
+
 
 class NeuralNetWrapper:
     class NNState(Enum):
@@ -63,21 +67,16 @@ class NeuralNetWrapper:
         # Inference has completed, ready for retrieval
         COMPLETE = auto()
 
-    def __init__(self, executor):
+    def __init__(self, executor, model_path):
         self.state = self.NNState.READY
         self.executor = executor
-
-    @classmethod
-    def load_model(self, executor, model_path, weights_only=True):
-        self.__init__(self, executor)
-        self.neural_network = NeuralNet()
-        print(self.neural_network.layers[0].weight)
+        self.neural_network = NeuralNet(deployed=True)
         self.neural_network.load_state_dict(torch.load(model_path))
-        print(self.neural_network.layers[0].weight)
 
     def run_neural_network(self, image):
-        z = self.neural_net.forward(image)
-        return z
+        image = self.neural_network.transform_image(image)
+        z = self.neural_network.forward(image)
+        return self.neural_network.post_process(z)
 
     def run_inference(self, image):
         ret_result = None

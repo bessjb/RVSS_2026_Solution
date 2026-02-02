@@ -58,8 +58,8 @@ class LLC:
                 executor,
                 velocity_msg_rate)
         self.camera_message = MessageTimer(
-                self.velocity_publisher,
-                self.velocity_response_callback,
+                self.camera_request_publisher,
+                self.camera_msg_callback,
                 executor,
                 camera_msg_rate)
 

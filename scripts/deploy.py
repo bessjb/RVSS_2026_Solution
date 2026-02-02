@@ -13,8 +13,7 @@ class RacerRobot:
                        self.executor,
                        args.velocity_msg_rate,
                        args.camera_msg_rate)
-        self.neural_net = NeuralNetWrapper.load_model(
-            self.executor, args.model_path)
+        self.neural_net = NeuralNetWrapper(self.executor, args.model_path)
         self.robot_controller = RobotController(
             speed_limit=args.speed_limit,
             control_duration=(args.control_duration / 1000))
@@ -75,14 +74,14 @@ class RacerRobot:
 
 def parse_args():
     parser = argparse.ArgumentParser(description='PiBot client')
-    parser.add_argument('--model_path', type=str)
+    parser.add_argument('--model_path', type=str, default="../weights/steer_net.pth")
     # LLC Parameters
     parser.add_argument('--ip', type=str, default='localhost',
                         help='IP address of PiBot')
     parser.add_argument('--velocity_msg_rate', type=int,
-                        default=50, help='velocity command message rate in hz')
+                        default=20, help='velocity command message rate in hz')
     parser.add_argument('--camera_msg_rate', type=int,
-                        default=10, help='Camera message rate in hz')
+                        default=5, help='Camera message rate in hz')
     parser.add_argument('--odom_msg_rate', type=int,
                         default=50, help='Odometry rate in hz')
     # Control Parameters
@@ -104,5 +103,5 @@ if __name__ == '__main__':
     args = parse_args()
     print(args.model_path)
     racer_robot = RacerRobot(args)
-    racer_robot.step_1_init()
+    #racer_robot.step_1_init()
     racer_robot.main()
