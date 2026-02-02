@@ -12,8 +12,7 @@ class RacerRobot:
         self.llc = LLC(args.ip,
                        self.executor,
                        args.velocity_msg_rate,
-                       args.camera_msg_rate,
-                       args.odom_msg_rate)
+                       args.camera_msg_rate)
         self.neural_net = NeuralNetWrapper.load_model(
             self.executor, args.model_path)
         self.robot_controller = RobotController(

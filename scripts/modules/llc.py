@@ -1,6 +1,7 @@
 import os
 import sys
 import concurrent.futures
+from collections import deque
 from enum import Enum, auto
 
 script_path = os.path.dirname(os.path.realpath(__file__))
@@ -46,9 +47,9 @@ class MessageTimer:
 
 
 class LLC:
-    def __init__(self, ip, executor, velocity_msg_rate, odom_msg_rate, camera_msg_rate):
+    def __init__(self, ip, executor, velocity_msg_rate, camera_msg_rate):
         self.bot = PiBot(ip=ip)
-        self.velocity = [0.0, 0.0]
+        self.velocity = [0, 0]
         self.image_queue = deque()
         self.odom_queue = deque()
         self.velocity_message = MessageTimer(
@@ -56,11 +57,6 @@ class LLC:
                 self.velocity_response_callback,
                 executor,
                 velocity_msg_rate)
-        self.odom_message = MessageTimer(
-                self.camera_request_publisher,
-                self.camera_msg_callback,
-                executor,
-                odom_msg_rate)
         self.camera_message = MessageTimer(
                 self.velocity_publisher,
                 self.velocity_response_callback,
@@ -75,7 +71,7 @@ class LLC:
         return ret_image
 
     def velocity_publisher(self):
-        self.bot.setVelocity(self.velocity)
+        self.bot.setVelocity(*self.velocity)
 
     def velocity_response_callback(self, response):
         pass

@@ -76,11 +76,8 @@ class NeuralNetWrapper:
         print(self.neural_network.layers[0].weight)
 
     def run_neural_network(self, image):
-
-        self.neural_net.transform_images(image)
-        self.neural_net.forward(image)
-        time.sleep(0.1)
-        return 5
+        z = self.neural_net.forward(image)
+        return z
 
     def run_inference(self, image):
         ret_result = None
