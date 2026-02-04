@@ -2,6 +2,7 @@ from machinevisiontoolbox import Image
 from matplotlib import pyplot as plt
 import numpy as np
 from scipy import ndimage
+from matplotlib.colors import hsv_to_rgb, rgb_to_hsv
 
 size = 5
 radius = 1.5  # roughly fills a 5x5 grid
@@ -64,8 +65,16 @@ def detect_white_chunck(im: Image):
     return opened_blobs
 
 
+def detect_red_hsv(hsv: np.ndarray, hue_range=0.1):
+    # there should be a range of values around which is red.
+    hue = hsv[..., 0]
+    near_red_low = hue < hue_range
+    near_red_high = hue > 1 - hue_range
+
+
 def detect_stop_sign(im: Image, within_stop_sign=10, n_pixels=20):
     roi = get_roi(im)
+
     red_blobs = detect_red_chunck(roi)
     white_blobs = detect_white_chunck(roi)
     dist_red = ndimage.distance_transform_edt(~red_blobs)
@@ -76,28 +85,41 @@ def detect_stop_sign(im: Image, within_stop_sign=10, n_pixels=20):
     local_blob_pixel_count = ndimage.uniform_filter(
         together_blobs.astype(np.float64), 10, mode='constant') * 100
 
-    plt.figure()
-    plt.imshow(roi.image)
-    plt.figure()
-    plt.imshow(local_blob_pixel_count)
-    plt.show()
-
+    # plt.figure()
+    # plt.imshow(roi.image)
+    # plt.figure()
+    # plt.imshow(local_blob_pixel_count)
+    # plt.show()
+    #
     if np.max(local_blob_pixel_count) > 20:
         return True
     else:
         return False
 
 
+def detect_stop_sign_hsv(im: Image, within_stop_sign=10, n_pixels=20):
+    roi = get_roi(im)
+    hsv_roi = rgb_to_hsv(roi.image)
+
+    plt.figure()
+    plt.imshow(hsv_roi)
+    plt.figure()
+    plt.imshow(roi.image)
+    # plt.imshow(roi.image)
+    plt.show()
+
+
 if __name__ == "__main__":
-    # im_path = "data/track3/000195-0.10.jpg"
+    im_path = "data/track3/000195-0.10.jpg"
     # im_path = "data/track3/001034-0.50.jpg"
     # im_path = "data/track3/001038-0.40.jpg"
     # im_path = "data/track3/000526-0.30.jpg"
 
     # orange road
     # im_path = 'data/track3/000809-0.30.jpg'
-    im_path = "data/track3/001065-0.10.jpg"
+    # im_path = "data/track3/001065-0.10.jpg"
 
     # im_path = "pics/sample_stop_sign.png"
     im = Image.Read(im_path)
-    detect_stop_sign(im)
+    detect_stop_sign_hsv(im)
+    # detect_stop_sign(im)
