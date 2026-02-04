@@ -88,9 +88,10 @@ def detect_stop_sign(im: np.ndarray, within_stop_sign=10, n_pixels=20):
         return False
 
 
-def detect_stop_sign_hsv(im: Image, within_stop_sign=10, n_pixels=20):
+def detect_stop_sign_hsv(im: np.ndarray, within_stop_sign=10, n_pixels=20):
     roi = get_roi(im)
     hsv_roi = rgb_to_hsv(roi.image)
+    red_blobs = detect_red_hsv()
 
     plt.figure()
     plt.imshow(hsv_roi)
