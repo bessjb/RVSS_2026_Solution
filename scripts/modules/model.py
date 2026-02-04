@@ -13,10 +13,6 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 
- 
-
-
-
 class NeuralNet(nn.Module):
     def __init__(self, deployed=False):
         super().__init__()
@@ -25,12 +21,13 @@ class NeuralNet(nn.Module):
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(1344, 256)
+        self.fc1 = nn.Linear(1728, 256)
         self.fc2 = nn.Linear(256, 5)
         self.relu = nn.ReLU()
 
         self.transform = transforms.Compose([transforms.ToTensor(),
-                                        transforms.Resize((40, 60)),
+                                        transforms.Resize((240, 120)),
+                                        transforms.Lambda(lambda img: transforms.functional.crop(img, 210, 0, 30, 120)),
                                         transforms.Normalize(
                                             (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                                         ])
