@@ -6,9 +6,10 @@ class RobotController:
         STOP = auto()
         GO = auto()
 
-    def __init__(self, speed_limit, control_duration):
+    def __init__(self, speed_limit, steer_angle_const, control_duration):
         self.speed_limit = speed_limit
         self.control_duration = control_duration
+        self.steer_angle_const = steer_angle_const
         self.next_tick = 0
 
         self.start_delay_timer = 5 
@@ -46,8 +47,8 @@ class RobotController:
             angle = 0.25  # slight right
         elif self.inference_results == 4:
             angle = 0.5  # sharp right
-        left  = int(self.speed_limit + angle)
-        right = int(self.speed_limit - angle)
+        left  = int(self.speed_limit + self.steer_angle_const*angle)
+        right = int(self.speed_limit - self.steer_angle_const*angle)
         return left, right
 
     def print_state(self, state):

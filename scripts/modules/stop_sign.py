@@ -75,12 +75,6 @@ def detect_stop_sign(im: np.ndarray, within_stop_sign=10, n_pixels=20):
     local_blob_pixel_count = ndimage.uniform_filter(
         together_blobs.astype(np.float64), 10, mode='constant') * 100
 
-    plt.figure()
-    plt.imshow(roi)
-    plt.figure()
-    plt.imshow(local_blob_pixel_count)
-    plt.show()
-
     if np.max(local_blob_pixel_count) > 20:
         return True
     else:

@@ -59,7 +59,7 @@ class RacerRobot:
                 self.llc.set_velocity(velocity_commanded)
 
             # TO DO: check for stop signs?
-            if self.stop_signs_enabled:
+            if self.stop_signs_enabled and last_image is not None:
                 stop_sign_state = detect_stop_sign(last_image)
                 #print("stop sign state {}".format(stop_sign_state))
                 self.robot_controller.set_stop_sign_state(stop_sign_state)
@@ -76,7 +76,7 @@ class RacerRobot:
 
 def parse_args():
     parser = argparse.ArgumentParser(description='PiBot client')
-    parser.add_argument('--model_path', type=str, default="../weights/steer_net.pth")
+    parser.add_argument('--model_path', type=str, default="../good_model_1.pth")
     # LLC Parameters
     parser.add_argument('--ip', type=str, default='localhost',
                         help='IP address of PiBot')
@@ -98,8 +98,8 @@ def parse_args():
     # TODO
     # High level logic Parameters
     parser.add_argument('--tick_duration', type=int,
-                        default=5, help='tick duration in ms')
-    parser.add_argument('--stop_signs_enabled', type=bool, default=False,
+                        default=15, help='tick duration in ms')
+    parser.add_argument('--stop_signs_enabled', type=bool, default=True,
                         help='Whether stop sign detection is avaulable')
     return parser.parse_args()
 
