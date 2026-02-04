@@ -53,7 +53,7 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 ###################
 
 train_ds = SteerDataSet(os.path.join(
-    script_path, '..', 'data', 'train_starter'), '.jpg', transform)
+    script_path, '..', 'data', 'test3_balanced'), '.jpg', transform)
 print("The train dataset contains %d images " % len(train_ds))
 
 # data loader nicely batches images for the training process and shuffles (if desired)
@@ -85,7 +85,7 @@ imshow(torchvision.utils.make_grid(example_ims))
 ########################
 
 val_ds = SteerDataSet(os.path.join(
-    script_path, '..', 'data', 'val_starter'), '.jpg', transform)
+    script_path, '..', 'data', 'test3_balanced'), '.jpg', transform)
 print("The train dataset contains %d images " % len(val_ds))
 
 # data loader nicely batches images for the training process and shuffles (if desired)
@@ -114,7 +114,7 @@ plt.show()
 # for classification tasks
 criterion = nn.CrossEntropyLoss()
 # You could use also ADAM
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.AdamW(net.parameters(), lr=0.001)
 
 
 #######################################################################################################################################
@@ -123,7 +123,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 losses = {'train': [], 'val': []}
 accs = {'train': [], 'val': []}
 best_acc = 0
-for epoch in range(10):  # loop over the dataset multiple times
+for epoch in range(30):  # loop over the dataset multiple times
 
     epoch_loss = 0.0
     correct = 0
@@ -182,7 +182,7 @@ for epoch in range(10):  # loop over the dataset multiple times
     losses['val'] += [val_loss/len(valloader)]
 
     if np.mean(class_accs) > best_acc:
-        torch.save(net.state_dict(), '../weights/steer_net_pth')
+        torch.save(net.state_dict(), '../weights/steer_net.pth')
         best_acc = np.mean(class_accs)
 
 print('Finished Training')
