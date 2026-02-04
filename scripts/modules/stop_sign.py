@@ -65,6 +65,7 @@ def detect_white_chunck(img: np.ndarray):
 
 def detect_stop_sign(im: np.ndarray, within_stop_sign=10, n_pixels=20):
     roi = get_roi(im)
+
     red_blobs = detect_red_chunck(roi)
     white_blobs = detect_white_chunck(roi)
     dist_red = ndimage.distance_transform_edt(~red_blobs)
@@ -87,8 +88,20 @@ def detect_stop_sign(im: np.ndarray, within_stop_sign=10, n_pixels=20):
         return False
 
 
+def detect_stop_sign_hsv(im: Image, within_stop_sign=10, n_pixels=20):
+    roi = get_roi(im)
+    hsv_roi = rgb_to_hsv(roi.image)
+
+    plt.figure()
+    plt.imshow(hsv_roi)
+    plt.figure()
+    plt.imshow(roi.image)
+    # plt.imshow(roi.image)
+    plt.show()
+
+
 if __name__ == "__main__":
-    # im_path = "data/track3/000195-0.10.jpg"
+    im_path = "data/track3/000195-0.10.jpg"
     # im_path = "data/track3/001034-0.50.jpg"
     im_path = "data/track3/001038-0.40.jpg"
     # im_path = "data/track3/000526-0.30.jpg"
