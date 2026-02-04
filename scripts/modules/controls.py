@@ -11,6 +11,12 @@ class RobotController:
         self.control_duration = control_duration
         self.next_tick = 0
 
+        self.start_delay_timer = 5 
+        self.stop_duration = 0.5
+
+        self.stop_time = 0
+        self.last_start = 0
+
         # stop the robot 
         self.velocity_setpoint = [0, 0]
         self.inference_results = None
@@ -24,8 +30,7 @@ class RobotController:
         self.latch_state_message = False
 
     def set_stop_sign_state(self, state):
-        last_stopsign_timeout = False
-        if state is True and not last_stopsign_timeout: self.request_stop = True
+        self.request_stop = state
 
     def set_inference_results(self, results):
         self.inference_results = results
@@ -53,7 +58,6 @@ class RobotController:
     def run_control_step(self, current_time):
         velocity_setpoint = None
         if self.next_tick < current_time:
-
             ## Robot is is Control State IDLE
             if self.state is self.ControlState.IDLE:
                 self.print_state(self.state)
@@ -65,17 +69,23 @@ class RobotController:
             ## Robot is is Control State STOP 
             elif self.state is self.ControlState.STOP:
                 self.print_state(self.state)
-                self.velocity_setpoint = [0, 0]
+                velocity_setpoint = [0, 0]
+                timeout = self.stop_time + self.stop_duration < current_time
                 ## Stop ---> GO
-                if self.request_start is True:
+                if timeout is True:
+                    self.latch_state_message = False
                     self.state = self.ControlState.GO
+                    self.last_start = current_time
 
             ## Robot is is Control State GO 
             elif self.state is self.ControlState.GO:
                 self.print_state(self.state)
                 velocity_setpoint = self.calculate_wheel_velocities()
+                stop_delay = self.last_start + self.start_delay_timer < current_time
                 ## GO ---> STOP
-                if self.request_stop is True:
+                if self.request_stop is True and stop_delay is True:
+                    self.latch_state_message = False
+                    self.stop_time = current_time
                     self.state = self.ControlState.STOP
             self.next_tick = current_time + self.control_duration
 

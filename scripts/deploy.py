@@ -3,7 +3,7 @@ import time
 import argparse
 import concurrent.futures
 from datetime import datetime
-from modules import LLC, NeuralNetWrapper, RobotController
+from modules import LLC, NeuralNetWrapper, RobotController, detect_stop_sign
 
 
 class RacerRobot:
@@ -16,6 +16,7 @@ class RacerRobot:
         self.neural_net = NeuralNetWrapper(self.executor, args.model_path)
         self.robot_controller = RobotController(
             speed_limit=args.speed_limit,
+            steer_angle_const=args.steer_angle_const,
             control_duration=(args.control_duration / 1000))
         self.tick_duration = (args.tick_duration / 1000)
         self.stop_signs_enabled = args.stop_signs_enabled
@@ -59,7 +60,8 @@ class RacerRobot:
 
             # TO DO: check for stop signs?
             if self.stop_signs_enabled:
-                stop_sign_state = self.check_for_stop_signs(last_image)
+                stop_sign_state = detect_stop_sign(last_image)
+                #print("stop sign state {}".format(stop_sign_state))
                 self.robot_controller.set_stop_sign_state(stop_sign_state)
 
             # Tick Rate logic
@@ -86,7 +88,10 @@ def parse_args():
                         default=50, help='Odometry rate in hz')
     # Control Parameters
     parser.add_argument('--speed_limit', type=int,
-                        default=10, help='control duration in ms')
+                        default=15, help='control duration in ms')
+    parser.add_argument('--steer_angle_const', type=int,
+                        default=15, help='control duration in ms')
+    
     parser.add_argument('--control_duration', type=int,
                         default=100, help='control duration in ms')
     # Neural Network parameters
