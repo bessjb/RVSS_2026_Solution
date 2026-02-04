@@ -32,15 +32,15 @@ class RobotController:
 
     def calculate_wheel_velocities(self):
         if self.inference_results == 0:
-            angle = 2  # sharp left
+            angle = -0.5  # sharp left
         elif self.inference_results == 1:
-            angle = 1  # slight left
+            angle = -0.25  # slight left
         elif self.inference_results == 2:
             angle = 0  # straight
         elif self.inference_results == 3:
-            angle = -1  # slight right
+            angle = 0.25  # slight right
         elif self.inference_results == 4:
-            angle = -2  # sharp right
+            angle = 0.5  # sharp right
         left  = int(self.speed_limit + angle)
         right = int(self.speed_limit - angle)
         return left, right
