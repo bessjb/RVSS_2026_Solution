@@ -13,7 +13,7 @@ import sklearn.metrics as metrics
 
 import matplotlib.pyplot as plt
 
-from steerDS import SteerDataSet
+from modules import SteerDataSet
 
 #######################################################################################################################################
 ####     This tutorial is adapted from the PyTorch "Train a Classifier" tutorial                                                   ####
@@ -53,7 +53,7 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 ###################
 
 train_ds = SteerDataSet(os.path.join(
-    script_path, '..', 'data', 'test3_balanced'), '.jpg', transform)
+    script_path, '..', 'data', 'test4_balanced'), '.jpg', transform)
 print("The train dataset contains %d images " % len(train_ds))
 
 # data loader nicely batches images for the training process and shuffles (if desired)
@@ -182,7 +182,7 @@ for epoch in range(30):  # loop over the dataset multiple times
     losses['val'] += [val_loss/len(valloader)]
 
     if np.mean(class_accs) > best_acc:
-        torch.save(net.state_dict(), '../weights/steer_net.pth')
+        torch.save(net.state_dict(), '../weights/test4_balanced_30px.pth')
         best_acc = np.mean(class_accs)
 
 print('Finished Training')
@@ -203,7 +203,7 @@ plt.show()
 #######################################################################################################################################
 ####     PERFORMANCE EVALUATION                                                                                                    ####
 #######################################################################################################################################
-net.load_state_dict(torch.load('../weights/steer_net.pth'))
+net.load_state_dict(torch.load('../weights/test4_balanced_30px.pth'))
 
 correct = 0
 total = 0
