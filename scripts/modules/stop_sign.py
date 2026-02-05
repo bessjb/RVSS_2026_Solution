@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import rgb_to_hsv
 import numpy as np
 from scipy import ndimage
-from PIL import Image
+import cv2 as cv
 
 size = 5
 radius = 1.5  # roughly fills a 5x5 grid
@@ -70,6 +70,8 @@ def detect_white_chunck(img: np.ndarray):
 
 
 def detect_stop_sign(im: np.ndarray, within_stop_sign=10, n_pixels=20):
+
+    im = cv.cvtColor(im, cv.COLOR_BGR2RGB)
     roi = get_roi(im)
     roi = normalise(roi)
 
@@ -116,6 +118,7 @@ def detect_white_hsv(hsv, saturation=0.2, value=0.7):
 
 
 def detect_stop_sign_hsv(im: np.ndarray, within_stop_sign=10, n_pixels=20):
+    im = cv.cvtColor(im, cv.COLOR_BGR2RGB)
     roi = get_roi(im)
     print(roi.dtype)
     if im.dtype == np.uint8:
@@ -162,6 +165,7 @@ if __name__ == "__main__":
     # im_path = 'data/0002650.00.jpg'
     # im_path = 'data/000837-0.50.jpg'
 
-    image = Image.open(im_path)
+    image = cv.imread(im_path)
+    # image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     im = np.asarray(image)
     detect_stop_sign_hsv(im)
