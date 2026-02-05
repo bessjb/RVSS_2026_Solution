@@ -9,6 +9,7 @@ import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import cv2 as cv
 
 from torch.utils.data import DataLoader
 
@@ -25,12 +26,15 @@ class NeuralNet(nn.Module):
         self.fc2 = nn.Linear(256, 5)
         self.relu = nn.ReLU()
 
-        self.transform = transforms.Compose([transforms.ToTensor(),
-                                        transforms.Resize((240, 120)),
-                                        transforms.Lambda(lambda img: transforms.functional.crop(img, 210, 0, 30, 120)),
-                                        transforms.Normalize(
-                                            (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-                                        ])
+        self.transform = transforms.Compose([
+            HsvTransform(),
+            transforms.ToTensor(),
+            transforms.Resize((240, 120)),
+            transforms.Lambda(
+                lambda img: transforms.functional.crop(img, 210, 0, 30, 120)),
+            transforms.Normalize(
+                (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ])
 
     def transform_image(self, image):
         return self.transform(image)
@@ -53,6 +57,11 @@ class NeuralNet(nn.Module):
 
     def post_process(self, z):
         return torch.argmax(z).item()
+
+
+class HsvTransform(nn.Module):
+    def forward(self, img):
+        return cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
 
 class NeuralNetWrapper:
